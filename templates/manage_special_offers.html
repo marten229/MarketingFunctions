@@ -1,0 +1,8 @@
+{% for offer in special_offers %}
+    <p>{{ offer.title }}</p>
+    <p>{{ offer.description }}</p>
+    <p>{{ offer.discount_rate }}</p>
+    <p>{{ offer.start_date }}</p>
+    <p>{{ offer.end_date }}</p>
+    <p>{{ offer.terms_conditions }}</p>
+{% endfor %}

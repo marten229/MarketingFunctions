@@ -1,0 +1,10 @@
+{% block content %}
+  <h1>Kundendaten Analyse</h1>
+  <form method="get">
+    {{ form.as_p }}
+    <button type="submit">Enter</button>
+  </form>
+  {% if data %}
+    <img src="data:image/png;base64,{{ data }}" alt="Customer Data Analysis">
+  {% endif %}
+{% endblock %}
