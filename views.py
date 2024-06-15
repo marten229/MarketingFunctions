@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from .models import SpecialOffer, Event
@@ -12,39 +12,40 @@ import urllib, base64
 from datetime import date
 from .forms import DateRangeForm
 import pandas as pd
+from .forms import SpecialOfferForm, EventForm
 
 #@login_required
-def create_special_offer_view(request, restaurant_id):
+def create_special_offer_view(request, pk):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
     if request.method == 'POST':
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        discount_rate = request.POST.get('discount_rate')
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-        terms_conditions = request.POST.get('terms_conditions')
-        SpecialOffer.objects.create(
-            restaurant_id=restaurant_id, title=title, description=description,
-            discount_rate=discount_rate, start_date=start_date, end_date=end_date,
-            terms_conditions=terms_conditions)
-    return render(request, 'create_special_offer.html')
+        form = SpecialOfferForm(request.POST)
+        if form.is_valid():
+            special_offer = form.save(commit=False)
+            special_offer.restaurant = restaurant
+            special_offer.save()
+            return redirect('manage_special_offers', pk=pk)
+    else:
+        form = SpecialOfferForm()
+    return render(request, 'create_special_offer.html', {'form': form, 'restaurant': restaurant})
 
 #@login_required
-def manage_special_offers_view(request, restaurant_id):
-    special_offers = SpecialOffer.objects.filter(restaurant_id=restaurant_id)
+def manage_special_offers_view(request, pk):
+    special_offers = SpecialOffer.objects.filter(restaurant_id=pk)
     return render(request, 'manage_special_offers.html', {'special_offers': special_offers})
 
 #@login_required
-def create_event_view(request, restaurant_id):
+def create_event_view(request, pk):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
     if request.method == 'POST':
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-        terms_conditions = request.POST.get('terms_conditions')
-        Event.objects.create(
-            restaurant_id=restaurant_id, title=title, description=description,
-            start_date=start_date, end_date=end_date, terms_conditions=terms_conditions)
-    return render(request, 'create_event.html')
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.restaurant = restaurant
+            event.save()
+            return redirect('manage_events', pk=pk)
+    else:
+        form = EventForm()
+    return render(request, 'create_event.html', {'form': form, 'restaurant': restaurant})
 
 #@login_required
 def manage_events_view(request, restaurant_id):
