@@ -1,7 +1,133 @@
-{% for event in events %}
-    <p>{{ event.title }}</p>
-    <p>{{ event.description }}</p>
-    <p>{{ event.start_date }}</p>
-    <p>{{ event.end_date }}</p>
-    <p>{{ event.terms_conditions }}</p>
-{% endfor %}
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    form {
+        margin-top: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="time"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    button[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .checkbox-group label {
+        margin-right: 10px;
+    }
+    .form-errors, .formset-errors {
+        color: red;
+        margin-top: 10px;
+    }
+    .dark-blue-links a {
+        color: darkblue;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+    .dark-blue-links a:hover {
+        text-decoration: underline;
+    }
+    .events-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+    .event-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .event-item h2 {
+        margin-top: 0;
+    }
+    .delete-form {
+        margin-top: 10px;
+    }
+    .delete-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .delete-button:hover {
+        background-color: #ff1a1a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dark-blue-links">
+    {% if restaurant %}
+        <a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a>
+        <a href="{% url 'create_event' restaurant.id %}">Event erstellen</a>
+        <a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a>
+        <a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a>
+        <a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a>
+    {% endif %}
+</div>
+<div class="events-container">
+    {% for event in events %}
+    <div class="event-item">
+        <h2>{{ event.title }}</h2>
+        <p><strong>Beschreibung:</strong> {{ event.description }}</p>
+        <p><strong>Startdatum:</strong> {{ event.start_date }}</p>
+        <p><strong>Enddatum:</strong> {{ event.end_date }}</p>
+        <p><strong>Allgemeine Bedingungen:</strong> {{ event.terms_conditions }}</p>
+        <form action="{% url 'delete_event' event.id %}" method="post" class="delete-form">
+            {% csrf_token %}
+            <button type="submit" class="delete-button">Löschen</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

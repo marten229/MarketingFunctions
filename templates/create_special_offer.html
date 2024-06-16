@@ -83,7 +83,9 @@ button[type="submit"]:hover {
     {% if restaurant %}
         <a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a>
         <a href="{% url 'create_event' restaurant.id %}">Event erstellen</a>
+        <a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a>
         <a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a>
+        <a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a>
     {% endif %}
 </div>
 <h1>Angebot erstellen</h1>

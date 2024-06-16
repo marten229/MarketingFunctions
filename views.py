@@ -1,6 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
 from .models import SpecialOffer, Event
 from ReviewFeedbackSystem.models import Bewertung
 from ReservationManagement.models import Reservation
@@ -13,8 +12,11 @@ from datetime import date
 from .forms import DateRangeForm
 import pandas as pd
 from .forms import SpecialOfferForm, EventForm
+from django.contrib.auth.decorators import login_required
+from UserManagement.decorators import role_and_restaurant_required
 
-#@login_required
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
 def create_special_offer_view(request, pk):
     restaurant = get_object_or_404(Restaurant, pk=pk)
     if request.method == 'POST':
@@ -28,12 +30,23 @@ def create_special_offer_view(request, pk):
         form = SpecialOfferForm()
     return render(request, 'create_special_offer.html', {'form': form, 'restaurant': restaurant})
 
-#@login_required
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
 def manage_special_offers_view(request, pk):
     special_offers = SpecialOffer.objects.filter(restaurant_id=pk)
-    return render(request, 'manage_special_offers.html', {'special_offers': special_offers})
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    return render(request, 'manage_special_offers.html', {'special_offers': special_offers, 'restaurant': restaurant})
 
-#@login_required
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
+def delete_special_offer_view(request, special_offer_id):
+    special_offer = get_object_or_404(SpecialOffer, id=special_offer_id)
+    pk = special_offer.restaurant_id
+    special_offer.delete()
+    return redirect('manage_special_offers', pk=pk)
+
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
 def create_event_view(request, pk):
     restaurant = get_object_or_404(Restaurant, pk=pk)
     if request.method == 'POST':
@@ -47,12 +60,23 @@ def create_event_view(request, pk):
         form = EventForm()
     return render(request, 'create_event.html', {'form': form, 'restaurant': restaurant})
 
-#@login_required
-def manage_events_view(request, restaurant_id):
-    events = Event.objects.filter(restaurant_id=restaurant_id)
-    return render(request, 'manage_events.html', {'events': events})
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
+def manage_events_view(request, pk):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    events = Event.objects.filter(restaurant_id=pk)
+    return render(request, 'manage_events.html', {'events': events, 'restaurant': restaurant})
 
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
+def delete_event_view(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    pk = event.restaurant_id
+    event.delete()
+    return redirect('manage_events', pk=pk)
 
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
 def analyze_customer_data(request, pk):
     restaurant = get_object_or_404(Restaurant, pk=pk)
     form = DateRangeForm(request.GET or None)
