@@ -126,11 +126,13 @@ button[type="base"] a {
 {% block content %}
 <div class="dark-blue-links">
     {% if restaurant %}
-        <button type='base'><span><a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a></span></button>
-        <button type='base'><span><a href="{% url 'create_event' restaurant.id %}">Event erstellen</a></span></button>
-        <button type='base'><span><a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a></span></button>
-        <button type='base'><span><a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a></span></button>
-        <button type='base'><span><a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a></span></button>
+    <button type='base'><span><a href="{% url 'create_event' restaurant.id %}">Event erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'create_promotion' restaurant.id %}">Promotion erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_promotions' restaurant.id %}">Promotion verwalten</a></span></button>
     {% endif %}
 </div>
 <h1>Angebot erstellen</h1>

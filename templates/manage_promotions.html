@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-
-{% block title %}Event erstellen{% endblock %}
+{% extends "base.html" %}
 
 {% block extra_styles %}
 <style>
@@ -135,10 +133,16 @@ button[type="base"] a {
     <button type='base'><span><a href="{% url 'manage_promotions' restaurant.id %}">Promotion verwalten</a></span></button>
     {% endif %}
 </div>
-<h1>Event erstellen</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Event erstellen</button>
-</form>
+  <h1>Promotions verwalten</h1>
+  <ul>
+    {% for promotion in promotions %}
+      <li>
+        {{ promotion.name }} - {{ promotion.description }} ({{ promotion.get_promotion_type_display }} - {{ promotion.value }})
+        <form action="{% url 'delete_promotion' restaurant.id promotion.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="delete-button">Löschen</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

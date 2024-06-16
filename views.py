@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import SpecialOffer, Event
+from .models import SpecialOffer, Event, Promotion
 from ReviewFeedbackSystem.models import Bewertung
 from ReservationManagement.models import Reservation
 from RestaurantManagement.models import Restaurant, MenuItem
@@ -11,7 +11,7 @@ import urllib, base64
 from datetime import date
 from .forms import DateRangeForm
 import pandas as pd
-from .forms import SpecialOfferForm, EventForm
+from .forms import SpecialOfferForm, EventForm, PromotionForm
 from django.contrib.auth.decorators import login_required
 from UserManagement.decorators import role_and_restaurant_required
 
@@ -39,7 +39,7 @@ def manage_special_offers_view(request, pk):
 
 @login_required
 @role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
-def delete_special_offer_view(request, special_offer_id):
+def delete_special_offer_view(request, pk, special_offer_id):
     special_offer = get_object_or_404(SpecialOffer, id=special_offer_id)
     pk = special_offer.restaurant_id
     special_offer.delete()
@@ -69,7 +69,7 @@ def manage_events_view(request, pk):
 
 @login_required
 @role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
-def delete_event_view(request, event_id):
+def delete_event_view(request, pk, event_id):
     event = get_object_or_404(Event, id=event_id)
     pk = event.restaurant_id
     event.delete()
@@ -210,3 +210,33 @@ def analyze_customer_data(request, pk):
         return render(request, 'analyze_customer_data.html', {'data': uri, 'restaurant': restaurant, 'form': form})
 
     return render(request, 'analyze_customer_data.html', {'form': form, 'restaurant': restaurant})
+
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
+def create_promotion_view(request, pk):
+    restaurant = get_object_or_404(Restaurant, id=pk)
+    if request.method == 'POST':
+        form = PromotionForm(request.POST)
+        if form.is_valid():
+            promotion = form.save(commit=False)
+            promotion.restaurant = restaurant
+            promotion.save()
+            return redirect('manage_promotions', pk=restaurant.id)
+    else:
+        form = PromotionForm()
+    return render(request, 'create_promotion.html', {'form': form, 'restaurant': restaurant})
+
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
+def manage_promotions_view(request, pk):
+    restaurant = get_object_or_404(Restaurant, id=pk)
+    promotions = Promotion.objects.filter(restaurant=restaurant)
+    return render(request, 'manage_promotions.html', {'promotions': promotions, 'restaurant': restaurant})
+
+@login_required
+@role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
+def delete_promotion_view(request, pk, promotion_id):
+    promotion = get_object_or_404(Promotion, id=promotion_id)
+    restaurant_id = promotion.restaurant.id
+    promotion.delete()
+    return redirect('manage_promotions', pk=restaurant_id)

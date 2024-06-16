@@ -153,11 +153,13 @@
 {% block content %}
 <div class="dark-blue-links">
     {% if restaurant %}
-        <button type='base'><span><a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a></span></button>
-        <button type='base'><span><a href="{% url 'create_event' restaurant.id %}">Event erstellen</a></span></button>
-        <button type='base'><span><a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a></span></button>
-        <button type='base'><span><a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a></span></button>
-        <button type='base'><span><a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a></span></button>
+    <button type='base'><span><a href="{% url 'create_event' restaurant.id %}">Event erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'create_promotion' restaurant.id %}">Promotion erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_promotions' restaurant.id %}">Promotion verwalten</a></span></button>
     {% endif %}
 </div>
 <div class="events-container">
@@ -168,7 +170,7 @@
         <p><strong>Startdatum:</strong> {{ event.start_date }}</p>
         <p><strong>Enddatum:</strong> {{ event.end_date }}</p>
         <p><strong>Allgemeine Bedingungen:</strong> {{ event.terms_conditions }}</p>
-        <form action="{% url 'delete_event' event.id %}" method="post" class="delete-form">
+        <form action="{% url 'delete_event' restaurant.id event.id %}" method="post" class="delete-form">
             {% csrf_token %}
             <button type="submit" class="delete-button">Löschen</button>
         </form>

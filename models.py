@@ -23,3 +23,25 @@ class Event(models.Model):
     end_date = models.DateField()
     terms_conditions = models.TextField()
 
+
+class Promotion(models.Model):
+    DISCOUNT = 'discount'
+    SPECIAL_ITEM = 'special_item'
+    LOYALTY_POINTS = 'loyalty_points'
+    
+    PROMOTION_TYPES = [
+        (DISCOUNT, 'Rabatt'),
+        (SPECIAL_ITEM, 'Gericht außerhalb der Karte'),
+        (LOYALTY_POINTS, 'Treuepunkte')
+    ]
+    
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='promotions')
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    promotion_type = models.CharField(max_length=20, choices=PROMOTION_TYPES)
+    value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.name
+
