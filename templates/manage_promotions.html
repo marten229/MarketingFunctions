@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+form {
+    margin-top: 20px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+}
+input[type="text"],
+input[type="email"],
+input[type="time"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+.checkbox-group label {
+    margin-right: 10px;
+}
+.form-errors, .formset-errors {
+    color: red;
+    margin-top: 10px;
+}
+.dark-blue-links a {
+    color: darkblue;
+    text-decoration: none;
+    margin-right: 10px;
+}
+.dark-blue-links a:hover {
+    text-decoration: underline;
+}
+button[type="base"] {
+    display: inline-block;
+    border-radius: 4px;
+    background-color: #4a98f7;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 17px;
+    padding: 16px;
+    width: auto;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button[type="base"] span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+button[type="base"] span:after {
+    content: '»';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -15px;
+    transition: 0.5s;
+}
+
+button[type="base"]:hover span {
+    padding-right: 15px;
+}
+
+button[type="base"]:hover span:after {
+    opacity: 1;
+    right: 0;
+}
+
+/* Entfernt die Standard-Stile für Links innerhalb des Buttons */
+button[type="base"] a {
+    color: inherit; /* Übernimmt die Schriftfarbe des Buttons */
+    text-decoration: none; /* Entfernt die Unterstreichung */
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dark-blue-links">
+    {% if restaurant %}
+    <button type='base'><span><a href="{% url 'analyze_customer_data' restaurant.id %}">Kundendaten Analyse</a></span></button>
+    <button type='base'><span><a href="{% url 'create_event' restaurant.id %}">Event erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_events' restaurant.id %}">Events verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'create_special_offer' restaurant.id %}">Angebot erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_special_offers' restaurant.id %}">Angebote verwalten</a></span></button>
+    <button type='base'><span><a href="{% url 'create_promotion' restaurant.id %}">Promotion erstellen</a></span></button>
+    <button type='base'><span><a href="{% url 'manage_promotions' restaurant.id %}">Promotion verwalten</a></span></button>
+    {% endif %}
+</div>
+  <h1>Promotions verwalten</h1>
+  <ul>
+    {% for promotion in promotions %}
+      <li>
+        {{ promotion.name }} - {{ promotion.description }} ({{ promotion.get_promotion_type_display }} - {{ promotion.value }})
+        <form action="{% url 'delete_promotion' restaurant.id promotion.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="delete-button">Löschen</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
