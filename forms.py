@@ -13,11 +13,7 @@ class EventForm(forms.ModelForm):
 class SpecialOfferForm(forms.ModelForm):
     class Meta:
         model = SpecialOffer
-        fields = ['title', 'description', 'discount_rate', 'start_date', 'end_date', 'terms_conditions']
-
-
-from django import forms
-from .models import Promotion
+        fields = ['title', 'description', 'discount_rate', 'code', 'start_date', 'end_date', 'terms_conditions']
 
 class PromotionForm(forms.ModelForm):
     class Meta:

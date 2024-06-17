@@ -13,7 +13,9 @@ from .forms import DateRangeForm
 import pandas as pd
 from .forms import SpecialOfferForm, EventForm, PromotionForm
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mass_mail
 from UserManagement.decorators import role_and_restaurant_required
+from django.conf import settings
 
 @login_required
 @role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
@@ -33,9 +35,37 @@ def create_special_offer_view(request, pk):
 @login_required
 @role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
 def manage_special_offers_view(request, pk):
-    special_offers = SpecialOffer.objects.filter(restaurant_id=pk)
     restaurant = get_object_or_404(Restaurant, pk=pk)
-    return render(request, 'manage_special_offers.html', {'special_offers': special_offers, 'restaurant': restaurant})
+    special_offers = SpecialOffer.objects.filter(restaurant_id=pk)
+    
+    offer_usage_counts = {}
+    for offer in special_offers:
+        usage_count = Reservation.objects.filter(restaurant=restaurant, rabattcode=offer).count()
+        offer_usage_counts[offer.id] = usage_count
+
+    return render(request, 'manage_special_offers.html', {'special_offers': special_offers, 'restaurant': restaurant, 'offer_usage_counts': offer_usage_counts})
+
+def send_offer_emails(request, pk, offer_id):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    offer = get_object_or_404(SpecialOffer, pk=offer_id)
+    reservations = Reservation.objects.filter(restaurant=restaurant).select_related('user')
+
+    unique_users = set()
+    for reservation in reservations:
+        if reservation.user and reservation.user.email:
+            unique_users.add(reservation.user)
+
+    messages = []
+    for user in unique_users:
+        subject = f"Neues Angebot bei {restaurant.name}: {offer.title}"
+        message = f"Liebe/r {user.first_name},\n\nWir freuen uns, Ihnen ein neues Angebot in unserem Restaurant vorzustellen:\n\n{offer.title}\n{offer.description}\n\nRabattcode: {offer.code}\nRabatt: {offer.discount_rate}%\n\nStartdatum: {offer.start_date}\nEnddatum: {offer.end_date}\n\n{offer.terms_conditions}\n\nWir freuen uns auf Ihren Besuch!\n\nMit freundlichen Grüßen,\n{restaurant.name}"
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [user.email]
+        messages.append((subject, message, from_email, recipient_list))
+
+    send_mass_mail(messages, fail_silently=False)
+
+    return redirect('manage_special_offers', pk=pk)
 
 @login_required
 @role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
@@ -66,6 +96,28 @@ def manage_events_view(request, pk):
     restaurant = get_object_or_404(Restaurant, pk=pk)
     events = Event.objects.filter(restaurant_id=pk)
     return render(request, 'manage_events.html', {'events': events, 'restaurant': restaurant})
+
+def send_event_emails(request, pk, event_id):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    event = get_object_or_404(Event, pk=event_id)
+    reservations = Reservation.objects.filter(restaurant=restaurant).select_related('user')
+
+    unique_users = set()
+    for reservation in reservations:
+        if reservation.user and reservation.user.email:
+            unique_users.add(reservation.user)
+
+    messages = []
+    for user in unique_users:
+        subject = f"Neues Event bei {restaurant.name}: {event.title}"
+        message = f"Liebe/r {user.first_name},\n\nWir freuen uns, Ihnen ein neues Event in unserem Restaurant vorzustellen:\n\n{event.title}\n{event.description}\n\nStartdatum: {event.start_date}\nEnddatum: {event.end_date}\n\n{event.terms_conditions}\n\nWir freuen uns auf Ihren Besuch!\n\nMit freundlichen Grüßen,\n{restaurant.name}"
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [user.email]
+        messages.append((subject, message, from_email, recipient_list))
+
+    send_mass_mail(messages, fail_silently=False)
+
+    return redirect('manage_events', pk=pk)
 
 @login_required
 @role_and_restaurant_required(['administrator', 'restaurant_owner', 'restaurant_staff'])
