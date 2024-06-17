@@ -9,11 +9,27 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ['title', 'description', 'start_date', 'end_date', 'terms_conditions']
+        labels = {
+            'title': 'Titel',
+            'description': 'Beschreibung',
+            'start_date': 'Startdatum',
+            'end_date': 'Enddatum',
+            'terms_conditions': 'Geschäftsbedingungen',
+        }
 
 class SpecialOfferForm(forms.ModelForm):
     class Meta:
         model = SpecialOffer
         fields = ['title', 'description', 'discount_rate', 'code', 'start_date', 'end_date', 'terms_conditions']
+        labels = {
+            'title': 'Titel',
+            'description': 'Beschreibung',
+            'discount_rate': 'Rabatt',
+            'code': 'Rabattcode',
+            'start_date': 'Startdatum',
+            'end_date': 'Enddatum',
+            'terms_conditions': 'Geschäftsbedingungen',
+        }
 
 class PromotionForm(forms.ModelForm):
     class Meta:
